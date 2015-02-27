@@ -2,37 +2,17 @@ package com.cplatform.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 
-/**
- * web聊天处理 <br>
- * <p>
- * Copyright: Copyright (c) Mar 3, 2014 9:33:37 AM
- * <p>
- * Company: 北京宽连十方数字技术有限公司
- * <p>
- * 
- * @author wuxc@c-platform.com
- * @version 1.0.0
- */
+import com.chat.ChatConnectManager;
+
+
 public class ChatServlet extends HttpServlet {
-	private static String ENTER = "\r\n";
-	private static String FLAG_ANSWER = "这个我还不会，你教我应该怎么回答吧，把正确答案回复给我就行了，我可是一学就会的。";
-	/** 锁对象 */
-	private static byte[] lockObj = new byte[0];
-
-	/** 日志 */
-	private static Logger log = Logger.getLogger(ChatServlet.class);
-
 	/**
 	 * Constructor of the object.
 	 */
@@ -85,22 +65,28 @@ public class ChatServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
+		String fromUser = request.getParameter("from_user").toString();
+		String password = request.getParameter("password").toString();
+		password = "ijnUHB";
+		String toUser = request.getParameter("to_user").toString();
+		String msg = request.getParameter("msg").toString();
 		PrintWriter out = null;
 		StringBuffer result = new StringBuffer();
-		String userId = "-1000";
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			HttpSession session = request.getSession();
-
-			result.append(sdf.format(new Date()));
-
+			this.doChat(fromUser, password, toUser, msg);
+			
+			result.append("test");
+			result.append(fromUser);
+			result.append(password);
+			result.append(toUser);
+			
 			response.setCharacterEncoding("GBK");
 			response.setContentType("text/html;charset=GBK");
 			// 获取输出数据流
 			out = response.getWriter();
-			out.print(result.toString());
+			out.print(result);
 		} catch (Exception ex) {
-			log.error("聊天出错", ex);
 			ex.printStackTrace();
 		} finally {
 			if (out != null) {
@@ -119,5 +105,12 @@ public class ChatServlet extends HttpServlet {
 	public void init() throws ServletException {
 
 	}
+	
+	private void doChat(String fromUser, String password, String toUser, String msg)
+	{
+		ChatConnectManager.sendMessage(fromUser, password, toUser, msg);
+	}
+	
+	
 
 }
